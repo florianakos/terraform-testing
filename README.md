@@ -29,7 +29,7 @@ terraform destroy
 
 ### manually via aws
 
-This assumes a local AWS profile `personal-aws` is already configured and is available to use for running this test.
+This assumes a local AWS profile `personal-aws` is already configured and is available to use for running this test. 
 
 ```shell
 cd test/terraform/aws
@@ -38,13 +38,37 @@ terraform apply
 terraform destroy
 ```
 
+Furtheromre, this test assumes that a bucket is already available in the AWS account for storing the terraform state remogtely!
+
+```hcl
+  backend "s3" {
+    bucket = "terraform-testing-via-go"
+    key = "test/s3-authz-test/terraform.tfstate"
+    region = "eu-central-1"
+    profile = "personal-aws"
+  }
+```
+
 ### automated via Go
 
 This option relies on the `/test/terraform/aws` but runs it automatically via the Go testing package.
 
 ```shell
-cd test/go
-go test
+ ▶ cd test/go
+ ▶ go test
+TestTerraform 2020-07-12T17:57:21+02:00 logger.go:66: Running command terraform with args [init -upgrade=false]
+TestTerraform 2020-07-12T17:57:21+02:00 logger.go:66: Initializing modules...
+TestTerraform 2020-07-12T17:57:21+02:00 logger.go:66: - s3_authz in ../../../tf-module-s3-auth
+TestTerraform 2020-07-12T17:57:21+02:00 logger.go:66: Initializing the backend...
+TestTerraform 2020-07-12T17:57:23+02:00 logger.go:66: Successfully configured the backend "s3"! Terraform will automatically
+TestTerraform 2020-07-12T17:57:29+02:00 logger.go:66: - s3_authz in ../../../tf-module-s3-auth
+...
+TestTerraform 2020-07-12T17:57:46+02:00 logger.go:66: Apply complete! Resources: 5 added, 0 changed, 0 destroyed.
+...
+TestTerraform 2020-07-12T17:58:04+02:00 logger.go:66: 
+TestTerraform 2020-07-12T17:58:04+02:00 logger.go:66: Destroy complete! Resources: 5 destroyed.
+PASS
+ok      github.com/florianakos/terraform-testing/tests  43.191s
 ```
 
 ## Conclusion
