@@ -27,6 +27,8 @@ terraform apply
 terraform destroy
 ```
 
+If localstack gets stuck in docker-compose you can reset it via `docker-compose down -v --rmi all --remove-orphans`.
+
 ### manually via aws
 
 This assumes a local AWS profile `personal-aws` is already configured and is available to use for running this test. 
