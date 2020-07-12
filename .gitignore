@@ -1,0 +1,5 @@
+*.json
+*.tfvars
+*.tfstate
+*.backup
+.terraform/
