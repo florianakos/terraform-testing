@@ -1,2 +1,5 @@
 # terraform-testing
-Testing AWS cloud Infrastructure-as-Code written in Terraform using Go and Localstack. 
+
+A project that combines terraform and testing via AWS and Localstack using Go's test capabilities.
+
+
