@@ -73,4 +73,6 @@ ok      github.com/florianakos/terraform-testing/tests  43.191s
 
 ## Conclusion
 
-Go is awesome! Terraform is awesome too... :)
+Testing via `localstack` is great as long as you are working with AWS and the targeted service is supported by localstack. It runs much much faster thanks to the fact that localhost is much closer to you than the cloud API endpoints. 
+
+Go is awesome! Terraform is awesome too! :) 
