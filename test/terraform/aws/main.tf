@@ -13,6 +13,11 @@ variable "iam_role_name" {
   default = "developer-role"
 }
 
+variable "s3_bucket_name" {
+  type    = string
+  default = "flrnks-secure-bucket"
+}
+
 locals {
   account_id = data.aws_caller_identity.current.account_id
   account_arn = data.aws_caller_identity.current.arn
@@ -71,7 +76,7 @@ module "s3_bucket" {
   region                    = var.region
   profile                   = var.profile
   account_id                = data.aws_caller_identity.current.account_id
-  bucket_name               = "flrnks-secure-bucket"
+  bucket_name               = var.s3_bucket_name
   object_versioning_enabled = true
   logging_bucket            = data.aws_s3_bucket.security_logging_bucket.id
   cidrs_to_write_bucket     = ["0.0.0.0/0"]
