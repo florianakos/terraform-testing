@@ -1,7 +1,15 @@
+variable "region" {
+  default = "eu-central-1"
+}
+
+variable "profile" {
+  default = "dummy-profile"
+}
+
 provider "aws" {
   access_key                  = "mock"
   secret_key                  = "mock"
-  region                      = "eu-central-1"
+  region                      = var.region
   s3_force_path_style         = true
   skip_credentials_validation = true
   skip_metadata_api_check     = true

@@ -1,12 +1,16 @@
-variable "role_name" {
+variable "iam_role_name" {
+  type    = string
   default = "developer-role"
 }
 
 locals {
   account_id   = "000000000000"
-  list_buckets = [aws_s3_bucket.b.id]
+  account_arn  = "arn:aws:iam::000000000000:role/mock" 
+  list_buckets = [
+    module.s3_bucket.bucket_id
+  ]
   get_from_bucket_prefixes = {
-    bucket_name = aws_s3_bucket.b.id
+    bucket_name = module.s3_bucket.bucket_id
     prefixes = [
       "*",
       "component=gfc/*",
@@ -14,13 +18,13 @@ locals {
     ]
   }
   get_objects_in_bucket = {
-    bucket_name = aws_s3_bucket.b.id
+    bucket_name = module.s3_bucket.bucket_id
     objects = [
       "component=gfc/subComponent=asus/date=20200402/metrics.json"
     ]
   }
   put_to_bucket_prefixes = {
-    bucket_name = aws_s3_bucket.b.id
+    bucket_name = module.s3_bucket.bucket_id
     prefixes = [
       "component=gfc/*",
       "component=input_telemetry_analytics/subComponent=webflows_v1/date=20200322/*"
@@ -33,14 +37,14 @@ data "aws_iam_policy_document" "assume_policy" {
   statement {
     actions = ["sts:AssumeRole", ]
     principals {
-      identifiers = ["arn:aws:iam::${local.account_id}:user/flrnks", ]
+      identifiers = ["arn:aws:iam::${local.account_id}:user/dummy", ]
       type        = "AWS"
     }
   }
 }
 
 resource "aws_iam_role" "new_role" {
-  name               = var.role_name
+  name               = var.iam_role_name
   assume_role_policy = data.aws_iam_policy_document.assume_policy.json
 }
 
@@ -48,14 +52,24 @@ resource "aws_kms_key" "key_for_bucket" {
   description = "KMS key 1"
 }
 
-resource "aws_s3_bucket" "b" {
-  bucket = "my-tf-test-bucket-flrnks"
-  acl    = "private"
+resource "aws_s3_bucket" "security_logs" {
+  bucket = "security-logs-bucket"
+  acl    = "log-delivery-write"
+}
 
-  tags = {
-    Name        = "My bucket"
-    Environment = "Dev"
-  }
+module "s3_bucket" {
+  source                    = "../../../tf-module-s3-bucket"
+  region                    = var.region
+  profile                   = var.profile
+  account_id                = local.account_id
+  bucket_name               = "flrnks-secure-bucket-via-tf"
+  object_versioning_enabled = true
+  logging_bucket            = aws_s3_bucket.security_logs.id
+  cidrs_to_write_bucket     = ["0.0.0.0/0"]
+  cidrs_to_read_bucket      = ["0.0.0.0/0"]
+  cidrs_to_list_bucket      = ["0.0.0.0/0"]
+  principals_whitelist      = [aws_iam_role.new_role.arn, local.account_arn]
+  default_kms_key_arn       = aws_kms_key.key_for_bucket.arn
 }
 
 module "s3_authz" {
@@ -72,11 +86,11 @@ module "s3_authz" {
 }
 
 output "s3_bucket_name" {
-  value = aws_s3_bucket.b.id
+  value = module.s3_bucket.bucket_id
 }
 
 output "s3_bucket_arn" {
-  value = aws_s3_bucket.b.arn
+  value = module.s3_bucket.bucket_id
 }
 
 output "iam_role_name" {

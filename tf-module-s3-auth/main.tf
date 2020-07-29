@@ -8,6 +8,13 @@ data "aws_iam_role" "target_role" {
 
 data "aws_iam_policy_document" "cumulative_s3_policy_document" {
   
+  statement {
+    sid       = "ListAllBucketsInAccount"
+    effect    = "Allow"
+    actions   = [ "s3:GetBucketLocation", "s3:ListAllMyBuckets" ]
+    resources = [ "*" ]
+  }
+  
   dynamic "statement" {
     iterator = element
     for_each = length(var.list_buckets) > 0 ? var.list_buckets : []
