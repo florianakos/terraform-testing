@@ -7,9 +7,9 @@ provider "aws" {
 
 terraform {
   backend "s3" {
-    key    = "test/s3/terraform.tfstate"
-    bucket = "terraform-testing-via-go"
-    region = "eu-central-1"
+    key     = "test/s3/terraform.tfstate"
+    bucket  = "terraform-testing-via-go"
+    region  = "eu-central-1"
     profile = "personal-aws"
   }
   required_version = ">= 0.12"

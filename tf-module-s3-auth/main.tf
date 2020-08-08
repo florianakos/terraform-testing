@@ -27,38 +27,38 @@ data "aws_iam_policy_document" "cumulative_s3_policy_document" {
   }
 
   dynamic "statement" {
-    for_each = var.get_from_bucket_prefixes != null ? [1] : []
+    for_each = length(var.get_object_from_bucket_prefix_list) > 0  ? var.get_object_from_bucket_prefix_list : []
     content {
-      sid       = "GetAllObjectsInBucketPrefixes"
+      sid       = "GetAnyObjectFromBucketPrefixList"
       effect    = "Allow"
       actions   = [ "s3:GetObject" ]
-      resources = var.get_from_bucket_prefixes != null ? formatlist("arn:aws:s3:::%s/%s", var.get_from_bucket_prefixes.bucket_name, var.get_from_bucket_prefixes.prefixes) : []
+      resources = formatlist("arn:aws:s3:::%s/%s", statement.value.bucket_name , statement.value.prefixes)
     }
   }
 
   dynamic "statement" {
-    for_each = var.get_objects_in_bucket != null ? [1] : []
+    for_each = length(var.get_object_from_bucket_list) > 0 ? var.get_object_from_bucket_list : []
     content {
-      sid       = "GetSpecificObjectsInBucket"
+      sid       = "GetSpecificObjectsFromBucket"
       effect    = "Allow"
       actions   = [ "s3:GetObject" ]
-      resources = var.get_objects_in_bucket != null ? formatlist("arn:aws:s3:::%s/%s", var.get_objects_in_bucket.bucket_name, var.get_objects_in_bucket.objects) : []
+      resources = formatlist("arn:aws:s3:::%s/%s", statement.value.bucket_name , statement.value.objects)
     }
   }
 
   dynamic "statement" {
-    for_each = var.put_to_bucket_prefixes != null ? [1] : []
+    for_each = length(var.put_object_to_bucket_prefix_list) > 0 ? var.put_object_to_bucket_prefix_list : []
     content {
       sid       = "PutObjectsToBucketPrefixes"
       effect    = "Allow"
       actions   = [ "s3:PutObject" ]
-      resources = var.put_to_bucket_prefixes != null ? formatlist("arn:aws:s3:::%s/%s", var.put_to_bucket_prefixes.bucket_name, var.put_to_bucket_prefixes.prefixes) : []
+      resources = formatlist("arn:aws:s3:::%s/%s", statement.value.bucket_name , statement.value.prefixes)
     }
   }
 
   dynamic "statement" {
     iterator = element
-    for_each = length(var.kms_ids_for_s3_ro) > 0 ? var.kms_ids_for_s3_ro : []
+    for_each = length(var.kms_ids_for_readonly_access) > 0 ? var.kms_ids_for_readonly_access : []
     content {
       sid       = "KMSForS3Download"
       effect    = "Allow"
@@ -69,7 +69,7 @@ data "aws_iam_policy_document" "cumulative_s3_policy_document" {
 
   dynamic "statement" {
     iterator = element
-    for_each = length(var.kms_ids_for_s3_wo) > 0 ? var.kms_ids_for_s3_wo : []
+    for_each = length(var.kms_ids_for_write_only_access) > 0 ? var.kms_ids_for_write_only_access : []
     content {
       sid       = "KMSForS3Upload"
       effect    = "Allow"

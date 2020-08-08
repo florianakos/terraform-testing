@@ -20,47 +20,49 @@ variable "list_buckets" {
   description = "List of Buckets for which the role needs s3:ListBucket permissions"
 }
 
-variable "get_from_bucket_prefixes" {
+variable "get_object_from_bucket_prefix_list" {
   default = null
-  type = object({
+  type = list(object({
     bucket_name     = string
     prefixes        = list(string)
-  })
+  }))
 
-  description = "Bucketname and prefixes for which s3:GetObject permission is needed"
+  description = "BucketName and prefixes for which s3:GetObject permission is granted"
 }
 
-variable "put_to_bucket_prefixes" {
+variable "put_object_to_bucket_prefix_list" {
   default = null
-  type = object({
+  type = list(object({
     bucket_name     = string
     prefixes        = list(string)
-  })
+  }))
 
-  description = "Bucketname and prefixes for which s3:PutObject permission is needed"
+  description = "BucketName and list of prefixes for which s3:PutObject permission is granted"
 }
 
-variable "get_objects_in_bucket" {
+variable "get_object_from_bucket_list" {
   default = null
-  type = object({
+  type = list(object({
     bucket_name     = string
     objects         = list(string)
-  })
+  }))
 
-  description = "Bucket name and list of objects that should be possble to GET"
+  description = "BucketName and list of specific objects for which s3:GetObject is granted"
 }
 
-variable "kms_ids_for_s3_ro" {
+// TODO: add further permissions (DELETE?)
+
+variable "kms_ids_for_readonly_access" {
   default = []
   type = list(string)
 
-  description = "List of KMS key IDs for which READ ONLY access is needed to decrypt and download from S3"
+  description = "List of KMS key IDs for which READ ONLY access is needed to decrypt and download objects from S3"
 }
 
-variable "kms_ids_for_s3_wo" {
+variable "kms_ids_for_write_only_access" {
   default = []
   type = list(string)
 
-  description = "List of KMS key IDs for which WRITE ONLY access is needed to encrypt and upload from S3"
+  description = "List of KMS key IDs for which WRITE ONLY access is needed to enrypt and upload objects to S3"
 }
 
