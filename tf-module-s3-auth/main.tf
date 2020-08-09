@@ -2,10 +2,6 @@ terraform {
   required_version = ">= 0.12"
 }
 
-data "aws_iam_role" "target_role" {
-  name = var.iam_role
-}
-
 data "aws_iam_policy_document" "cumulative_s3_policy_document" {
   
   statement {
@@ -86,6 +82,6 @@ resource "aws_iam_policy" "s3_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "role_policy_attachment" {
-  role = data.aws_iam_role.target_role.name
+  role       = var.target_role_name
   policy_arn = aws_iam_policy.s3_policy.arn
 }

@@ -4,32 +4,32 @@ variable "iam_role_name" {
 }
 
 locals {
-  account_id   = "000000000000"
-  account_arn  = "arn:aws:iam::000000000000:role/mock" 
+  account_id  = "000000000000"
+  account_arn = "arn:aws:iam::000000000000:role/mock"
   list_buckets = [
     module.s3_bucket.bucket_id
   ]
-  get_from_bucket_prefixes = {
+  get_object_from_bucket_prefix_list = [{
     bucket_name = module.s3_bucket.bucket_id
     prefixes = [
       "*",
       "component=gfc/*",
       "component=input_telemetry_analytics/subComponent=webflows_v1/date=20200320/*"
     ]
-  }
-  get_objects_in_bucket = {
+  }]
+  get_object_from_bucket_list = [{
     bucket_name = module.s3_bucket.bucket_id
     objects = [
       "component=gfc/subComponent=asus/date=20200402/metrics.json"
     ]
-  }
-  put_to_bucket_prefixes = {
+  }]
+  put_object_to_bucket_prefix_list = [{
     bucket_name = module.s3_bucket.bucket_id
     prefixes = [
       "component=gfc/*",
       "component=input_telemetry_analytics/subComponent=webflows_v1/date=20200322/*"
     ]
-  }
+  }]
   kms_ids_for_s3_rw = [aws_kms_key.key_for_bucket.id]
 }
 
@@ -73,16 +73,16 @@ module "s3_bucket" {
 }
 
 module "s3_authz" {
-  source                   = "../../../tf-module-s3-auth"
-  region                   = "eu-central-1"
-  iam_role                 = aws_iam_role.new_role.name
-  account_id               = local.account_id
-  list_buckets             = local.list_buckets
-  get_from_bucket_prefixes = local.get_from_bucket_prefixes
-  get_objects_in_bucket    = local.get_objects_in_bucket
-  put_to_bucket_prefixes   = local.put_to_bucket_prefixes
-  kms_ids_for_s3_ro        = local.kms_ids_for_s3_rw
-  kms_ids_for_s3_wo        = local.kms_ids_for_s3_rw
+  source                             = "../../../tf-module-s3-auth"
+  region                             = "eu-central-1"
+  target_role_name                   = aws_iam_role.new_role.name
+  account_id                         = local.account_id
+  list_buckets                       = local.list_buckets
+  get_object_from_bucket_prefix_list = local.get_object_from_bucket_prefix_list
+  get_object_from_bucket_list        = local.get_object_from_bucket_list
+  put_object_to_bucket_prefix_list   = local.put_object_to_bucket_prefix_list
+  kms_ids_for_readonly_access        = local.kms_ids_for_s3_rw
+  kms_ids_for_write_only_access      = local.kms_ids_for_s3_rw
 }
 
 output "s3_bucket_name" {

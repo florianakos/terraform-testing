@@ -8,9 +8,9 @@ variable "account_id" {
   type = string
 }
 
-variable "iam_role" {
+variable "target_role_name" {
+  default = null
   type = string
-  description = "Name of the IAM Role to which the S3 policies will be attached"
 }
 
 variable "list_buckets" {

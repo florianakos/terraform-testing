@@ -1,5 +1,5 @@
 output "iam_role_name" {
-  value = data.aws_iam_role.target_role.name
+  value = var.target_role_name
 }
 
 output "iam_policy_name" {
