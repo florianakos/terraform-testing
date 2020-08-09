@@ -94,7 +94,7 @@ module "s3_bucket" {
 module "s3_authz" {
   source                             = "../../../tf-module-s3-auth"
   region                             = "eu-central-1"
-  target_role_n                      = aws_iam_role.new_role.name
+  target_role_name                     = aws_iam_role.new_role.name
   account_id                         = local.account_id
   list_buckets                       = local.list_buckets
   get_object_from_bucket_prefix_list = local.get_object_from_bucket_prefix_list
